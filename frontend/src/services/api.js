@@ -5,6 +5,11 @@ export const getDocuments = async () => {
   return res.data;
 };
 
+export const getAllDocuments = async () => {
+  const res = await axios.get("/documents/all");
+  return res.data;
+};
+
 export const uploadDocument = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -29,8 +34,17 @@ export const updateDocument = async (docId, data) => {
   return res.data;
 };
 
+export const updateDocumentt = async (docId, data) => {
+  const res = await axios.patch(`/documents/update/${docId}`, data);
+  return res.data;
+};
+
 export const deleteDocument = async (docId) => {
   const res = await axios.delete(`/documents/${docId}`);
+  return res.data;
+};
+export const deleteDocumentt = async (docId) => {
+  const res = await axios.delete(`/documents/delete/${docId}`);
   return res.data;
 };
 
@@ -60,10 +74,10 @@ export const updateUserProfile = async (profileForm) => {
 
 export const getAllUsers = async (params = {}) => {
   try {
-    const response = await axios.get('/users', { params });
+    const response = await axios.get("/users", { params });
     return {
       data: response.data.data,
-      pagination: response.data.pagination
+      pagination: response.data.pagination,
     };
   } catch (error) {
     throw error;
@@ -96,12 +110,12 @@ export const deleteUser = async (userId) => {
 };
 export const getLogs = async (params = {}) => {
   try {
-    const response = await axios.get('/admin/logs', { params });
+    const response = await axios.get("/admin/logs", { params });
     return {
       data: response.data.data,
       total: response.data.pagination.total,
       currentPage: response.data.pagination.currentPage,
-      totalPages: response.data.pagination.totalPages
+      totalPages: response.data.pagination.totalPages,
     };
   } catch (error) {
     throw error;
@@ -112,5 +126,3 @@ export const verifyDocumentSignature = async (docId) => {
   const response = await axios.get(`/documents/${docId}/verify`);
   return response.data;
 };
-
-

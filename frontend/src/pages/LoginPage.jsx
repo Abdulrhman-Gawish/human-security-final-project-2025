@@ -56,15 +56,19 @@ export default function LoginPage() {
       localStorage.setItem("userRole", data.data.user.role);
       if (data.data.user.role === "admin") {
         navigate("/adminDashboard");
-      } else {
-        if (!data.data.user.is2FAEnabled) {
-          navigate("/setup-2fa");
-        } else if (data.data.user.is2FAEnabled) {
-          navigate("/verify-2fa");
-        } else {  
-          navigate("/userDashboard");
-        }
+      } else if(data.data.user.role === "user"){
+        navigate("/NormalUserDashboard")
+      }else{
+        navigate("/userDashboard")
       }
+        // if (!data.data.user.is2FAEnabled) {
+        //   navigate("/setup-2fa");
+        // } else if (data.data.user.is2FAEnabled) {
+        //   navigate("/verify-2fa");
+        // } else {  
+        //   navigate("/userDashboard");
+        // }
+      // }
     } catch (err) {
       setError(
         err.response?.data?.message ||

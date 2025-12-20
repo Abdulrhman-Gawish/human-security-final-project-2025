@@ -8,6 +8,7 @@ import {
   Shield,
   ArrowRight,
 } from "lucide-react";
+import { login } from "../services/auth";
 
 export default function Homepage() {
   const [hoveredFeature, setHoveredFeature] = useState(null);
@@ -66,6 +67,12 @@ export default function Homepage() {
               className="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-lg transition"
             >
               Login
+            </button>
+            <button
+              onClick={login}
+              className="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-lg transition"
+            >
+              Login with keycloak
             </button>
             <button
               onClick={() => (window.location.href = "/signup")}
