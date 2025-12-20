@@ -9,7 +9,7 @@ router.get("/logout", authController.logout);
 router.get("/checkAuth", verifyToken, authController.checkAuth);
 router.post("/enable2FA", verifyToken, authController.enable2FA);
 router.post("/verify2FA", verifyToken, authController.verify2FA);
-
+router.post("/callback", authController.handleAuthCallback);
 /**
  * @desc    GitHub OAuth Routes
  */

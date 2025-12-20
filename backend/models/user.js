@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const { Schema } = mongoose;
 const UserRoles = require("../utils/enums/userRole");
@@ -30,7 +30,7 @@ const userSchema = new Schema(
     },
     auth_method: {
       type: String,
-      enum: ["manual", "github"],
+      enum: ["manual", "github", "keycloak"],
       default: "manual",
     },
     github_id: {

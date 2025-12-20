@@ -28,6 +28,6 @@ router
 
   router
   .route("/profile")
-  .patch(verifyToken, checkRole([userRole.ADMIN, userRole.USER]), updateUserProfile);
+  .patch(verifyToken, checkRole([userRole.ADMIN, userRole.USER, userRole.STAFF]), updateUserProfile);
 
 module.exports = router;

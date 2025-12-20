@@ -2,8 +2,11 @@ const User = require("../models/user");
 const QRCode = require("qrcode");
 const speakeasy = require("speakeasy");
 const axios = require("axios");
+const jwt = require("jsonwebtoken");
 const generateTokenAndSetCookie = require("../utils/generateTokenAndSetCookie");
 const AppError = require("../utils/appError");
+const dotenv = require("dotenv");
+dotenv.config();
 
 /**
  * @desc    Sign up a new user
@@ -106,6 +109,125 @@ const logout = (req, res) => {
     success: true,
     message: "User logged out, cookie cleared",
   });
+};
+
+/**
+ * @desc    Handle Keycloak OAuth callback
+ * @route   POST /api/auth/keycloak/callback
+ * @access  Public
+ */
+const handleAuthCallback = async (req, res, next) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      return next(new AppError("Authorization code is required", 400));
+    }
+
+    // Exchange authorization code for tokens
+    const tokenResponse = await axios.post(
+      "http://localhost:8080/realms/library-realm/protocol/openid-connect/token",
+      new URLSearchParams({
+        grant_type: "authorization_code",
+        client_id: "library-frontend",
+        client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
+        code,
+        redirect_uri: "https://localhost:3000/callback",
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    const { access_token, refresh_token, expires_in } = tokenResponse.data;
+    console.log("access token: ", access_token);
+
+    if (!access_token) {
+      return next(new AppError("Failed to retrieve access token", 401));
+    }
+    const publicKey = `-----BEGIN PUBLIC KEY-----\n${process.env.PUBLICKEY}\n-----END PUBLIC KEY-----`;
+    console.log("pK", publicKey);
+
+    const decoded = jwt.verify(access_token, publicKey, {
+      algorithms: ["RS256"],
+    });
+
+    console.log("decoded: ", decoded);
+    const kcRoles = decoded.realm_access?.roles || [];
+
+    let appRole = "user"; // default
+
+    if (kcRoles.includes("STAFF")) {
+      appRole = "staff";
+    }
+
+    if (kcRoles.includes("admin")) {
+      appRole = "admin";
+    }
+
+    // Fetch user info from Keycloak
+    const userInfoResponse = await axios.get(
+      "http://localhost:8080/realms/library-realm/protocol/openid-connect/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    console.log("user info: ", userInfoResponse);
+
+    const {
+      sub: keycloakId,
+      preferred_username,
+      email,
+      name,
+    } = userInfoResponse.data;
+
+    // Find or create user
+    let user = await User.findOne({ keycloak_id: keycloakId });
+
+    if (!user) {
+      user = await User.create({
+        name: name || preferred_username,
+        email,
+        auth_method: "keycloak",
+        keycloak_id: keycloakId,
+        role: appRole,
+      });
+    } else {
+      // keep role in sync with Keycloak
+      user.role = appRole;
+      await user.save();
+    }
+
+    // Issue your app JWT
+    const payload = { userId: user._id, userRole: user.role };
+    generateTokenAndSetCookie(payload, res);
+
+    res.status(200).json({
+      success: true,
+      message: "Authentication successful",
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        expires_in,
+        refresh_token,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Keycloak OAuth error:",
+      error.response?.data || error.message
+    );
+    next(new AppError("Token exchange failed", 401));
+  }
 };
 
 /**
@@ -330,4 +452,5 @@ module.exports = {
   verify2FA,
   githubAuth,
   githubCallback,
+  handleAuthCallback,
 };

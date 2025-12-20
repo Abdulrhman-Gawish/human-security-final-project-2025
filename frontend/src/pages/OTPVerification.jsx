@@ -48,7 +48,7 @@ export default function OTPVerification({ onVerificationSuccess }) {
           onVerificationSuccess();
         }
         setTimeout(() => {
-          window.location.href = "/userDashboard";
+          window.location.href = "/NormaluserDashboard";
         }, 1000);
       } else {
         setVerificationResult({

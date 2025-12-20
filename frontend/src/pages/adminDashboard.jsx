@@ -8,6 +8,9 @@ import {
   Users,
   Activity,
   RefreshCw,
+  FileText,
+  Save,
+  X,
 } from "lucide-react";
 import {
   getAllUsers,
@@ -16,12 +19,25 @@ import {
   deleteUser,
   logout,
   getLogs,
+  getAllDocuments,
+  updateDocumentt,
+  deleteDocumentt,
 } from "../services/api";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("users");
   const [users, setUsers] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [editingDocId, setEditingDocId] = useState(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(null);
+
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState("");
+
+  const [documents, setDocuments] = useState([]);
+  const [editingDoc, setEditingDoc] = useState(null);
+  const [newDocName, setNewDocName] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -56,7 +72,7 @@ export default function AdminDashboard() {
         limit,
       });
       console.log("teDate: ", response.data);
-      
+
       setUsers(response.data);
       setUsersTotal(response.count);
     } catch (err) {
@@ -80,7 +96,7 @@ export default function AdminDashboard() {
       };
 
       const response = await getLogs(params);
-      console.log("Dataaaaaaaaaaaaaaaaaaaaaa: ", response.data)
+      console.log("Dataaaaaaaaaaaaaaaaaaaaaa: ", response.data);
       setLogs(response.data);
       setLogsTotal(response.total);
 
@@ -95,13 +111,42 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchDocuments = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getAllDocuments(); // Replace with your actual API endpoint
+      console.log(response.data);
+
+      setDocuments(response.data);
+    } catch (err) {
+      let errorMessage = "Failed to fetch documents. Please try again later.";
+
+      setError(errorMessage);
+      console.error("Error fetching documents:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
   useEffect(() => {
     if (activeTab === "users") {
       fetchUsers();
     } else if (activeTab === "logs") {
       fetchLogs();
+    } else if (activeTab === "documents") {
+      fetchDocuments();
     }
-  }, [activeTab, usersPage, logsPage, logFilters]); // Added logFilters to dependencies
+  }, [activeTab, usersPage, logsPage, logFilters, refreshTrigger]); // Added logFilters to dependencies
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -224,6 +269,60 @@ export default function AdminDashboard() {
     }
   };
 
+  const startEdit = (doc) => {
+    setEditingDoc(doc);
+    setNewDocName(doc.docName); // corrected
+  };
+
+  const cancelEdit = () => {
+    setEditingDoc(null);
+    setNewDocName("");
+  };
+
+  const saveEdit = async () => {
+    if (!editingDoc || !newDocName.trim()) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await updateDocumentt(editingDoc.id, { docName: newDocName }); // corrected
+      setDocuments((docs) =>
+        docs.map((doc) =>
+          doc.id === editingDoc.id ? { ...doc, docName: newDocName } : doc
+        )
+      );
+      cancelEdit();
+    } catch (err) {
+      setError("Failed to update document");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmDelete = (docId) => setShowConfirmDelete(docId);
+  const cancelDelete = () => setShowConfirmDelete(null);
+
+  const handleDelete = async (docId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log("Deleting doc with ID:", docId);
+      await deleteDocumentt(docId); // assumes this function accepts `id`
+      setDocuments((docs) => docs.filter((doc) => doc.id !== docId)); // corrected
+      
+      setShowConfirmDelete(null);
+    } catch (err) {
+      setError("Failed to delete document");
+      console.error("Full error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -270,12 +369,158 @@ export default function AdminDashboard() {
               Activity Logs
             </div>
           </button>
+          <button
+            className={`px-4 py-2 ${
+              activeTab === "documents"
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-600"
+            }`}
+            onClick={() => setActiveTab("documents")}
+          >
+            <div className="flex items-center">
+              <FileText size={18} className="mr-2" />
+              Documents
+            </div>
+          </button>
         </div>
 
         {/* Error message */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
             {error}
+          </div>
+        )}
+
+        {activeTab === "documents" && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold flex items-center text-gray-800">
+                <FileText className="mr-2" />
+                Document Management
+              </h2>
+              <button
+                onClick={handleRefresh}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+              >
+                <RefreshCw size={18} className="mr-1" />
+                Refresh
+              </button>
+            </div>
+
+            <div className="bg-white shadow overflow-hidden rounded-lg">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 table-fixed">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Document Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Uploaded At
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Uploaded By
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {loading && documents.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="px-6 py-4 text-center">
+                          <div className="flex justify-center">
+                            <RefreshCw
+                              size={24}
+                              className="animate-spin text-blue-500"
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ) : documents.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="4"
+                          className="px-6 py-4 text-center text-gray-500"
+                        >
+                          No documents found
+                        </td>
+                      </tr>
+                    ) : (
+                      documents.map((doc) => (
+                        <tr key={doc.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap max-w-xs overflow-hidden text-ellipsis">
+                            {editingDoc?.id === doc.id ? (
+                              <input
+                                type="text"
+                                value={newDocName}
+                                onChange={(e) => setNewDocName(e.target.value)}
+                                className="border rounded-md px-2 py-1 w-full"
+                                autoFocus
+                              />
+                            ) : (
+                              <div className="flex items-center">
+                                <FileText
+                                  size={16}
+                                  className="mr-2 text-blue-500"
+                                />
+                                <span className="text-gray-900 truncate">
+                                  {doc.docName || doc.name}
+                                </span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {formatDate(doc.uploadedAt)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {doc.uploadedBy?.name || doc.uploadedBy || "N/A"}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            {editingDoc?.id === doc.id ? (
+                              <>
+                                <button
+                                  onClick={saveEdit}
+                                  className="text-green-600 hover:text-green-800 mr-2"
+                                  title="Save"
+                                >
+                                  <Save size={16} />
+                                </button>
+                                <button
+                                  onClick={cancelEdit}
+                                  className="text-gray-600 hover:text-gray-800"
+                                  title="Cancel"
+                                >
+                                  <X size={16} />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => startEdit(doc)}
+                                  className="text-blue-600 hover:text-blue-900 mr-2"
+                                  title="Edit"
+                                >
+                                  <Edit size={16} />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(doc.id)}
+                                  className="text-red-600 hover:text-red-900"
+                                  title="Delete"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 

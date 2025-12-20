@@ -196,9 +196,18 @@ const verifyDocumentSignaturee = async (req, res, next) => {
  */
 const downloadDocument = async (req, res, next) => {
   try {
+    console.log(req.params.id);
+    if (req.role === "staff") {
+      const document = await Document.findOne({
+        _id: req.params.id,
+        userId: req.userId,
+      });
+      if (!document) {
+        next(new AppError("File not found", 404));
+      }
+    }
     const document = await Document.findOne({
       _id: req.params.id,
-      userId: req.userId,
     });
     if (!document) {
       next(new AppError("File not found", 404));
@@ -362,6 +371,53 @@ const updateDocument = async (req, res, next) => {
   }
 };
 
+const updateDocumentt = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { originalName } = req.body;
+
+    if (!originalName?.trim()) {
+      throw new AppError("Document name is required", 400);
+    }
+
+    const updatedDocument = await Document.findOneAndUpdate(
+      { _id: id },
+      { originalName: originalName.trim() },
+      { new: true, runValidators: true }
+    ).select("_id originalName updatedAt mimeType");
+
+    if (!updatedDocument) {
+      throw new AppError("Document not found or unauthorized", 404);
+    }
+
+    await Log.create({
+      action: "UPDATE",
+      entity: "Document",
+      userId: req.user._id,
+      documentId: updatedDocument._id,
+      userDetails: {
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+      },
+      documentDetails: {
+        fileName: updatedDocument.originalName,
+        mimeType: updatedDocument.mimeType,
+      },
+      ipAddress: req.ip,
+      userAgent: req.get("User-Agent"),
+    });
+
+    res.status(200).json({
+      success: true,
+      data: updatedDocument,
+    });
+  } catch (error) {
+    next(
+      new AppError(`Update failed: ${error.message}`, error.statusCode || 500)
+    );
+  }
+};
 /**
  * @desc    Delete a document
  * @route   DELETE /api/documents/:docId
@@ -405,6 +461,108 @@ const deleteDocument = async (req, res, next) => {
     );
   }
 };
+
+/**
+ * @desc    Delete a document by admin
+ * @route   DELETE /api/documents/delete/:docId
+ * @access  Private
+ */
+const deleteDocumentt = async (req, res, next) => {
+  try {
+    const { docId } = req.params;
+
+    const document = await Document.findOneAndDelete({
+      _id: docId,
+    });
+
+    if (!document) {
+      throw new AppError("Document not found or unauthorized", 404);
+    }
+
+    await Log.create({
+      action: "DELETE",
+      entity: "Document",
+      userId: req.user._id,
+      documentId: docId,
+      userDetails: {
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+      },
+      documentDetails: {
+        fileName: document.originalName,
+        mimeType: document.mimeType,
+      },
+      ipAddress: req.ip,
+      userAgent: req.get("User-Agent"),
+    });
+
+    res.status(204).end();
+  } catch (error) {
+    next(
+      new AppError(`Deletion failed: ${error.message}`, error.statusCode || 500)
+    );
+  }
+};
+/**
+ * @desc    Get all a documents
+ * @route   GET /api/documents/all
+ * @access  Private
+ */
+const getAllDocuments = async (req, res, next) => {
+  try {
+    const { title, startDate, endDate } = req.query;
+
+    const query = {};
+
+    if (title) {
+      query.originalName = { $regex: title, $options: "i" };
+    }
+
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+
+    const documents = await Document.find(query)
+      .select("_id originalName createdAt userId")
+      .populate("userId", "name email") // Assuming User model has name and email fields
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!documents.length) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No documents found for this user",
+      });
+    }
+
+    // Format the response data
+    const formattedDocuments = documents.map((doc) => ({
+      id: doc._id,
+      docName: doc.originalName,
+      uploadedAt: doc.createdAt,
+      uploadedBy: doc.userId
+        ? {
+            id: doc.userId._id,
+            name: doc.userId.name,
+            email: doc.userId.email,
+          }
+        : null,
+    }));
+    console.log(formattedDocuments);
+
+    res.status(200).json({
+      success: true,
+      count: formattedDocuments.length,
+      data: formattedDocuments,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 module.exports = {
   uploadDocument,
   downloadDocument,
@@ -412,4 +570,7 @@ module.exports = {
   updateDocument,
   deleteDocument,
   verifyDocumentSignaturee,
+  getAllDocuments,
+  deleteDocumentt,
+  updateDocumentt,
 };
