@@ -163,11 +163,13 @@ export default function NormalUserDashboard() {
     try {
       await logout();
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userRole");
+      window.location.href = "/";
     } catch (err) {
       console.error("Error during logout:", err);
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   };
 

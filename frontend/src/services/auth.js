@@ -9,8 +9,10 @@ export const login = () => {
     "?client_id=library-frontend" +
     "&response_type=code" +
     "&scope=openid" +
+    "&prompt=login" +                // 🔥 FORCE LOGIN
     "&redirect_uri=https://localhost:3000/callback";
 };
+
 
 
 

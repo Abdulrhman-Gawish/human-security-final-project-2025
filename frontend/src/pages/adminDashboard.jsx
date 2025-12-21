@@ -261,11 +261,13 @@ export default function AdminDashboard() {
     try {
       await logout();
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userRole");
+      window.location.href = "/";
     } catch (err) {
       console.error("Error during logout:", err);
       localStorage.removeItem("token");
-      window.location.href = "/login";
+      window.location.href = "/";
     }
   };
 
@@ -309,7 +311,7 @@ export default function AdminDashboard() {
       console.log("Deleting doc with ID:", docId);
       await deleteDocumentt(docId); // assumes this function accepts `id`
       setDocuments((docs) => docs.filter((doc) => doc.id !== docId)); // corrected
-      
+
       setShowConfirmDelete(null);
     } catch (err) {
       setError("Failed to delete document");
@@ -324,25 +326,25 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className='min-h-screen bg-gray-100'>
       {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+      <header className='bg-white shadow'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center'>
+          <h1 className='text-3xl font-bold text-gray-900'>Admin Dashboard</h1>
           <button
             onClick={handleLogout}
-            className="flex items-center text-gray-700 hover:text-gray-900"
+            className='flex items-center text-gray-700 hover:text-gray-900'
           >
-            <LogOut size={18} className="mr-1" />
+            <LogOut size={18} className='mr-1' />
             Logout
           </button>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
         {/* Tabs */}
-        <div className="flex border-b mb-6">
+        <div className='flex border-b mb-6'>
           <button
             className={`px-4 py-2 ${
               activeTab === "users"
@@ -351,8 +353,8 @@ export default function AdminDashboard() {
             }`}
             onClick={() => setActiveTab("users")}
           >
-            <div className="flex items-center">
-              <Users size={18} className="mr-2" />
+            <div className='flex items-center'>
+              <Users size={18} className='mr-2' />
               Users Management
             </div>
           </button>
@@ -364,8 +366,8 @@ export default function AdminDashboard() {
             }`}
             onClick={() => setActiveTab("logs")}
           >
-            <div className="flex items-center">
-              <Activity size={18} className="mr-2" />
+            <div className='flex items-center'>
+              <Activity size={18} className='mr-2' />
               Activity Logs
             </div>
           </button>
@@ -377,8 +379,8 @@ export default function AdminDashboard() {
             }`}
             onClick={() => setActiveTab("documents")}
           >
-            <div className="flex items-center">
-              <FileText size={18} className="mr-2" />
+            <div className='flex items-center'>
+              <FileText size={18} className='mr-2' />
               Documents
             </div>
           </button>
@@ -386,54 +388,54 @@ export default function AdminDashboard() {
 
         {/* Error message */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
             {error}
           </div>
         )}
 
         {activeTab === "documents" && (
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold flex items-center text-gray-800">
-                <FileText className="mr-2" />
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-semibold flex items-center text-gray-800'>
+                <FileText className='mr-2' />
                 Document Management
               </h2>
               <button
                 onClick={handleRefresh}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+                className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center'
               >
-                <RefreshCw size={18} className="mr-1" />
+                <RefreshCw size={18} className='mr-1' />
                 Refresh
               </button>
             </div>
 
-            <div className="bg-white shadow overflow-hidden rounded-lg">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 table-fixed">
-                  <thead className="bg-gray-50">
+            <div className='bg-white shadow overflow-hidden rounded-lg'>
+              <div className='overflow-x-auto'>
+                <table className='min-w-full divide-y divide-gray-200 table-fixed'>
+                  <thead className='bg-gray-50'>
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Document Name
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Uploaded At
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Uploaded By
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className='bg-white divide-y divide-gray-200'>
                     {loading && documents.length === 0 ? (
                       <tr>
-                        <td colSpan="4" className="px-6 py-4 text-center">
-                          <div className="flex justify-center">
+                        <td colSpan='4' className='px-6 py-4 text-center'>
+                          <div className='flex justify-center'>
                             <RefreshCw
                               size={24}
-                              className="animate-spin text-blue-500"
+                              className='animate-spin text-blue-500'
                             />
                           </div>
                         </td>
@@ -441,56 +443,56 @@ export default function AdminDashboard() {
                     ) : documents.length === 0 ? (
                       <tr>
                         <td
-                          colSpan="4"
-                          className="px-6 py-4 text-center text-gray-500"
+                          colSpan='4'
+                          className='px-6 py-4 text-center text-gray-500'
                         >
                           No documents found
                         </td>
                       </tr>
                     ) : (
                       documents.map((doc) => (
-                        <tr key={doc.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap max-w-xs overflow-hidden text-ellipsis">
+                        <tr key={doc.id} className='hover:bg-gray-50'>
+                          <td className='px-6 py-4 whitespace-nowrap max-w-xs overflow-hidden text-ellipsis'>
                             {editingDoc?.id === doc.id ? (
                               <input
-                                type="text"
+                                type='text'
                                 value={newDocName}
                                 onChange={(e) => setNewDocName(e.target.value)}
-                                className="border rounded-md px-2 py-1 w-full"
+                                className='border rounded-md px-2 py-1 w-full'
                                 autoFocus
                               />
                             ) : (
-                              <div className="flex items-center">
+                              <div className='flex items-center'>
                                 <FileText
                                   size={16}
-                                  className="mr-2 text-blue-500"
+                                  className='mr-2 text-blue-500'
                                 />
-                                <span className="text-gray-900 truncate">
+                                <span className='text-gray-900 truncate'>
                                   {doc.docName || doc.name}
                                 </span>
                               </div>
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                             {formatDate(doc.uploadedAt)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                             {doc.uploadedBy?.name || doc.uploadedBy || "N/A"}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                          <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2'>
                             {editingDoc?.id === doc.id ? (
                               <>
                                 <button
                                   onClick={saveEdit}
-                                  className="text-green-600 hover:text-green-800 mr-2"
-                                  title="Save"
+                                  className='text-green-600 hover:text-green-800 mr-2'
+                                  title='Save'
                                 >
                                   <Save size={16} />
                                 </button>
                                 <button
                                   onClick={cancelEdit}
-                                  className="text-gray-600 hover:text-gray-800"
-                                  title="Cancel"
+                                  className='text-gray-600 hover:text-gray-800'
+                                  title='Cancel'
                                 >
                                   <X size={16} />
                                 </button>
@@ -499,15 +501,15 @@ export default function AdminDashboard() {
                               <>
                                 <button
                                   onClick={() => startEdit(doc)}
-                                  className="text-blue-600 hover:text-blue-900 mr-2"
-                                  title="Edit"
+                                  className='text-blue-600 hover:text-blue-900 mr-2'
+                                  title='Edit'
                                 >
                                   <Edit size={16} />
                                 </button>
                                 <button
                                   onClick={() => handleDelete(doc.id)}
-                                  className="text-red-600 hover:text-red-900"
-                                  title="Delete"
+                                  className='text-red-600 hover:text-red-900'
+                                  title='Delete'
                                 >
                                   <Trash2 size={16} />
                                 </button>
@@ -527,47 +529,47 @@ export default function AdminDashboard() {
         {/* Users Management Tab */}
         {activeTab === "users" && (
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Users</h2>
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-semibold'>Users</h2>
               <button
                 onClick={openCreateModal}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+                className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center'
               >
-                <Plus size={18} className="mr-1" />
+                <Plus size={18} className='mr-1' />
                 Add User
               </button>
             </div>
 
             {/* Users table */}
-            <div className="bg-white shadow overflow-hidden rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className='bg-white shadow overflow-hidden rounded-lg'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Name
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Created At
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className='bg-white divide-y divide-gray-200'>
                   {loading && users.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="px-6 py-4 text-center">
-                        <div className="flex justify-center">
+                      <td colSpan='5' className='px-6 py-4 text-center'>
+                        <div className='flex justify-center'>
                           <RefreshCw
                             size={24}
-                            className="animate-spin text-blue-500"
+                            className='animate-spin text-blue-500'
                           />
                         </div>
                       </td>
@@ -575,8 +577,8 @@ export default function AdminDashboard() {
                   ) : users.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="5"
-                        className="px-6 py-4 text-center text-gray-500"
+                        colSpan='5'
+                        className='px-6 py-4 text-center text-gray-500'
                       >
                         No users found
                       </td>
@@ -584,17 +586,17 @@ export default function AdminDashboard() {
                   ) : (
                     users.map((user) => (
                       <tr key={user._id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
+                        <td className='px-6 py-4 whitespace-nowrap'>
+                          <div className='text-sm font-medium text-gray-900'>
                             {user.name}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-500">
+                        <td className='px-6 py-4 whitespace-nowrap'>
+                          <div className='text-sm text-gray-500'>
                             {user.email}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className='px-6 py-4 whitespace-nowrap'>
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                               user.role === "admin"
@@ -605,19 +607,19 @@ export default function AdminDashboard() {
                             {user.role}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                           {new Date(user.createdAt).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                           <button
                             onClick={() => openEditModal(user)}
-                            className="text-blue-600 hover:text-blue-900 mr-3"
+                            className='text-blue-600 hover:text-blue-900 mr-3'
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={() => deleteUserHandler(user._id)}
-                            className="text-red-600 hover:text-red-900"
+                            className='text-red-600 hover:text-red-900'
                           >
                             <Trash2 size={16} />
                           </button>
@@ -630,9 +632,9 @@ export default function AdminDashboard() {
             </div>
 
             {/* Pagination for users */}
-            <div className="mt-4 flex justify-between items-center">
+            <div className='mt-4 flex justify-between items-center'>
               <div>
-                <span className="text-gray-600 text-sm">
+                <span className='text-gray-600 text-sm'>
                   {usersTotal > 0
                     ? `Showing ${(usersPage - 1) * limit + 1} to ${Math.min(
                         usersPage * limit,
@@ -641,7 +643,7 @@ export default function AdminDashboard() {
                     : "No results"}
                 </span>
               </div>
-              <div className="flex">
+              <div className='flex'>
                 <button
                   onClick={() => setUsersPage((p) => Math.max(1, p - 1))}
                   disabled={usersPage === 1}
@@ -672,98 +674,98 @@ export default function AdminDashboard() {
         {/* Logs Tab */}
         {activeTab === "logs" && (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Activity Logs</h2>
+            <h2 className='text-xl font-semibold mb-4'>Activity Logs</h2>
 
             {/* Filters */}
-            <div className="bg-white shadow rounded-lg p-4 mb-4">
-              <h3 className="text-lg font-medium mb-3">Filters</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className='bg-white shadow rounded-lg p-4 mb-4'>
+              <h3 className='text-lg font-medium mb-3'>Filters</h3>
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     Action
                   </label>
                   <select
-                    name="action"
+                    name='action'
                     value={logFilters.action}
                     onChange={handleFilterChange}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                    className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                   >
-                    <option value="">All Actions</option>
-                    <option value="CREATE">Create</option>
-                    <option value="READ">Read</option>
-                    <option value="READ_ALL">Read All</option>
-                    <option value="UPDATE">Update</option>
-                    <option value="UPDATE_PROFILE">Update Profile</option>
-                    <option value="DELETE">Delete</option>
+                    <option value=''>All Actions</option>
+                    <option value='CREATE'>Create</option>
+                    <option value='READ'>Read</option>
+                    <option value='READ_ALL'>Read All</option>
+                    <option value='UPDATE'>Update</option>
+                    <option value='UPDATE_PROFILE'>Update Profile</option>
+                    <option value='DELETE'>Delete</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     Entity
                   </label>
                   <select
-                    name="entity"
+                    name='entity'
                     value={logFilters.entity}
                     onChange={handleFilterChange}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                    className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                   >
-                    <option value="">All Entities</option>
-                    <option value="User">User</option>
+                    <option value=''>All Entities</option>
+                    <option value='User'>User</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     User ID
                   </label>
                   <input
-                    type="text"
-                    name="userId"
+                    type='text'
+                    name='userId'
                     value={logFilters.userId}
                     onChange={handleFilterChange}
-                    placeholder="Enter User ID"
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                    placeholder='Enter User ID'
+                    className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     Start Date
                   </label>
                   <input
-                    type="date"
-                    name="startDate"
+                    type='date'
+                    name='startDate'
                     value={logFilters.startDate}
                     onChange={handleFilterChange}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                    className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     End Date
                   </label>
                   <input
-                    type="date"
-                    name="endDate"
+                    type='date'
+                    name='endDate'
                     value={logFilters.endDate}
                     onChange={handleFilterChange}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                    className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                   />
                 </div>
 
-                <div className="flex items-end">
+                <div className='flex items-end'>
                   <button
                     onClick={applyFilters}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-2 flex items-center"
+                    className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-2 flex items-center'
                   >
-                    <Search size={16} className="mr-1" />
+                    <Search size={16} className='mr-1' />
                     Apply Filters
                   </button>
                   <button
                     onClick={resetFilters}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded flex items-center"
+                    className='bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded flex items-center'
                   >
                     Reset
                   </button>
@@ -772,35 +774,35 @@ export default function AdminDashboard() {
             </div>
 
             {/* Logs table */}
-            <div className="bg-white shadow overflow-hidden rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className='bg-white shadow overflow-hidden rounded-lg'>
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead className='bg-gray-50'>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Action
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Entity
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       IP Address
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className='bg-white divide-y divide-gray-200'>
                   {loading && logs.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="px-6 py-4 text-center">
-                        <div className="flex justify-center">
+                      <td colSpan='5' className='px-6 py-4 text-center'>
+                        <div className='flex justify-center'>
                           <RefreshCw
                             size={24}
-                            className="animate-spin text-blue-500"
+                            className='animate-spin text-blue-500'
                           />
                         </div>
                       </td>
@@ -808,8 +810,8 @@ export default function AdminDashboard() {
                   ) : logs.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="5"
-                        className="px-6 py-4 text-center text-gray-500"
+                        colSpan='5'
+                        className='px-6 py-4 text-center text-gray-500'
                       >
                         No logs found
                       </td>
@@ -817,10 +819,10 @@ export default function AdminDashboard() {
                   ) : (
                     logs.map((log) => (
                       <tr key={log._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                           {new Date(log.createdAt).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className='px-6 py-4 whitespace-nowrap'>
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                               log.action === "CREATE"
@@ -835,19 +837,19 @@ export default function AdminDashboard() {
                             {log.action}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
                           {log.entity}
                           {log.entityId && (
-                            <span className="text-gray-500 text-xs">
+                            <span className='text-gray-500 text-xs'>
                               {" "}
                               ({log.entityId})
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                           {log.userDetails?.name || "Unknown"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                           {log.ipAddress}
                         </td>
                       </tr>
@@ -858,9 +860,9 @@ export default function AdminDashboard() {
             </div>
 
             {/* Pagination for logs */}
-            <div className="mt-4 flex justify-between items-center">
+            <div className='mt-4 flex justify-between items-center'>
               <div>
-                <span className="text-gray-600 text-sm">
+                <span className='text-gray-600 text-sm'>
                   {logsTotal > 0
                     ? `Showing ${(logsPage - 1) * limit + 1} to ${Math.min(
                         logsPage * limit,
@@ -869,7 +871,7 @@ export default function AdminDashboard() {
                     : "No results"}
                 </span>
               </div>
-              <div className="flex">
+              <div className='flex'>
                 <button
                   onClick={() => setLogsPage((p) => Math.max(1, p - 1))}
                   disabled={logsPage === 1}
@@ -902,9 +904,9 @@ export default function AdminDashboard() {
 
         {/* User Modal */}
         {modalOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">
+          <div className='fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50'>
+            <div className='bg-white rounded-lg shadow-xl p-6 w-full max-w-md'>
+              <h2 className='text-xl font-semibold mb-4'>
                 {selectedUser
                   ? `Edit User: ${selectedUser.name}`
                   : "Add New User"}
@@ -912,77 +914,77 @@ export default function AdminDashboard() {
               <form onSubmit={handleSubmit}>
                 {!selectedUser && (
                   <>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className='mb-4'>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
                         Name
                       </label>
                       <input
-                        type="text"
-                        name="name"
+                        type='text'
+                        name='name'
                         value={formData.name}
                         onChange={handleChange}
                         required={!selectedUser}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                        className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                       />
                     </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className='mb-4'>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
                         Email
                       </label>
                       <input
-                        type="email"
-                        name="email"
+                        type='email'
+                        name='email'
                         value={formData.email}
                         onChange={handleChange}
                         required={!selectedUser}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                        className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                       />
                     </div>
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className='mb-4'>
+                      <label className='block text-sm font-medium text-gray-700 mb-1'>
                         Password
                       </label>
                       <input
-                        type="password"
-                        name="password"
+                        type='password'
+                        name='password'
                         value={formData.password}
                         onChange={handleChange}
                         required={!selectedUser}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                        className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                       />
                     </div>
                   </>
                 )}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                <div className='mb-6'>
+                  <label className='block text-sm font-medium text-gray-700 mb-1'>
                     Role
                   </label>
                   <select
-                    name="role"
+                    name='role'
                     value={formData.role}
                     onChange={handleChange}
-                    className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border"
+                    className='block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2 border'
                   >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
+                    <option value='user'>User</option>
+                    <option value='admin'>Admin</option>
                   </select>
                 </div>
-                <div className="flex justify-end">
+                <div className='flex justify-end'>
                   <button
-                    type="button"
+                    type='button'
                     onClick={() => setModalOpen(false)}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
+                    className='bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2'
                   >
                     Cancel
                   </button>
                   <button
-                    type="submit"
+                    type='submit'
                     disabled={loading}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center"
+                    className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center'
                   >
                     {loading ? (
                       <>
-                        <RefreshCw size={16} className="animate-spin mr-1" />
+                        <RefreshCw size={16} className='animate-spin mr-1' />
                         Processing...
                       </>
                     ) : selectedUser ? (

@@ -237,13 +237,14 @@ export default function Dashboard() {
     setLoading(true);
     try {
       await logout();
+      localStorage.removeItem("token");
       localStorage.removeItem("authToken");
       localStorage.removeItem("userRole");
-      navigate("/");
+      window.location.href = "/";
     } catch (err) {
-      console.error("Logout failed:", err);
-    } finally {
-      setLoading(false);
+      console.error("Error during logout:", err);
+      localStorage.removeItem("token");
+      window.location.href = "/";
     }
   };
 
@@ -265,20 +266,20 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className='flex flex-col min-h-screen bg-gray-50'>
       {/* Header */}
-      <header className="bg-indigo-600 text-white py-4 px-6 shadow-md">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Secure Document Vault</h1>
-          <div className="flex items-center space-x-4">
-            <div className="relative group">
+      <header className='bg-indigo-600 text-white py-4 px-6 shadow-md'>
+        <div className='flex justify-between items-center'>
+          <h1 className='text-2xl font-bold'>Secure Document Vault</h1>
+          <div className='flex items-center space-x-4'>
+            <div className='relative group'>
               <button
-                className="flex items-center space-x-2 bg-indigo-700 hover:bg-indigo-800 py-1 px-3 rounded"
+                className='flex items-center space-x-2 bg-indigo-700 hover:bg-indigo-800 py-1 px-3 rounded'
                 onClick={handleProfileEdit}
               >
-                <div className="flex items-center">
-                  <User size={18} className="mr-2" />
-                  <span className="font-medium">{user.name}</span>
+                <div className='flex items-center'>
+                  <User size={18} className='mr-2' />
+                  <span className='font-medium'>{user.name}</span>
                 </div>
                 <ChevronDown
                   size={16}
@@ -290,61 +291,61 @@ export default function Dashboard() {
 
               {/* Profile Dropdown */}
               {isEditingProfile && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10 p-4 border border-gray-200">
-                  <h3 className="text-lg font-semibold mb-2 text-gray-800">
+                <div className='absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10 p-4 border border-gray-200'>
+                  <h3 className='text-lg font-semibold mb-2 text-gray-800'>
                     User Profile
                   </h3>
-                  <div className="space-y-3">
+                  <div className='space-y-3'>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className='block text-sm font-medium text-gray-700'>
                         Name
                       </label>
                       <input
-                        type="text"
-                        name="name"
+                        type='text'
+                        name='name'
                         value={profileForm.name}
                         onChange={handleProfileChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-800"
+                        className='mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-800'
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className='block text-sm font-medium text-gray-700'>
                         Email
                       </label>
                       <input
-                        type="email"
-                        name="email"
+                        type='email'
+                        name='email'
                         value={profileForm.email}
                         onChange={handleProfileChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-800"
+                        className='mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-800'
                         disabled
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">
+                      <label className='block text-sm font-medium text-gray-700'>
                         Password
                       </label>
                       <input
-                        type="password"
-                        name="password"
+                        type='password'
+                        name='password'
                         value={profileForm.password}
                         onChange={handleProfileChange}
-                        className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-800"
-                        placeholder="••••••••"
+                        className='mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-800'
+                        placeholder='••••••••'
                       />
                     </div>
-                    <div className="flex justify-end space-x-2">
+                    <div className='flex justify-end space-x-2'>
                       <button
                         onClick={handleProfileCancel}
-                        className="px-3 py-1 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                        className='px-3 py-1 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400'
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleProfileSave}
-                        className="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center"
+                        className='px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center'
                       >
-                        <Save size={16} className="mr-1" />
+                        <Save size={16} className='mr-1' />
                         Save
                       </button>
                     </div>
@@ -355,9 +356,9 @@ export default function Dashboard() {
             <button
               onClick={handleLogout}
               disabled={loading}
-              className="flex items-center bg-indigo-700 hover:bg-indigo-800 py-1 px-3 rounded text-sm transition-colors disabled:opacity-60"
+              className='flex items-center bg-indigo-700 hover:bg-indigo-800 py-1 px-3 rounded text-sm transition-colors disabled:opacity-60'
             >
-              <LogOut size={16} className="mr-1" />
+              <LogOut size={16} className='mr-1' />
               {loading ? "Logging out..." : "Logout"}
             </button>
           </div>
@@ -365,33 +366,33 @@ export default function Dashboard() {
       </header>
 
       {/* Rest of the component remains the same */}
-      <main className="flex-grow p-6">
-        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6">
+      <main className='flex-grow p-6'>
+        <div className='max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6'>
           {/* File Upload Section */}
-          <div className="mb-8 border-b pb-6">
-            <h2 className="text-xl font-semibold mb-4">Upload New Document</h2>
-            <div className="flex items-center space-x-4">
+          <div className='mb-8 border-b pb-6'>
+            <h2 className='text-xl font-semibold mb-4'>Upload New Document</h2>
+            <div className='flex items-center space-x-4'>
               <input
-                type="file"
-                id="file-upload"
+                type='file'
+                id='file-upload'
                 onChange={handleFileChange}
-                className="hidden"
+                className='hidden'
               />
               <label
-                htmlFor="file-upload"
-                className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded flex items-center"
+                htmlFor='file-upload'
+                className='cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded flex items-center'
               >
-                <Plus size={18} className="mr-2" />
+                <Plus size={18} className='mr-2' />
                 {selectedFile ? "Change File" : "Select File"}
               </label>
               {selectedFile && (
-                <div className="flex items-center">
-                  <span className="text-sm text-gray-600">
+                <div className='flex items-center'>
+                  <span className='text-sm text-gray-600'>
                     {selectedFile.name}
                   </span>
                   <button
                     onClick={() => setSelectedFile(null)}
-                    className="ml-2 text-gray-500 hover:text-gray-700"
+                    className='ml-2 text-gray-500 hover:text-gray-700'
                   >
                     <X size={16} />
                   </button>
@@ -406,7 +407,7 @@ export default function Dashboard() {
                     : "bg-green-600 hover:bg-green-700"
                 }`}
               >
-                <Upload size={18} className="mr-2" />
+                <Upload size={18} className='mr-2' />
                 Upload
               </button>
             </div>
@@ -414,42 +415,42 @@ export default function Dashboard() {
 
           {/* Documents List Section */}
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Your Documents</h2>
-              <div className="relative">
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-semibold'>Your Documents</h2>
+              <div className='relative'>
                 <input
-                  type="text"
-                  placeholder="Search documents..."
+                  type='text'
+                  placeholder='Search documents...'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 pr-4 py-2 border rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  className='pl-9 pr-4 py-2 border rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-indigo-300'
                 />
                 <Search
                   size={18}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'
                 />
               </div>
             </div>
 
             {/* Error state */}
             {error && (
-              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+              <div className='bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4'>
                 <p>{error}</p>
               </div>
             )}
 
             {/* Loading state */}
             {isLoading && !documents.length && (
-              <div className="flex justify-center p-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+              <div className='flex justify-center p-12'>
+                <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500'></div>
               </div>
             )}
 
             {/* Empty state */}
             {!isLoading && !documents.length && (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <File size={48} className="mx-auto text-gray-400" />
-                <p className="mt-4 text-gray-600">
+              <div className='text-center py-12 bg-gray-50 rounded-lg'>
+                <File size={48} className='mx-auto text-gray-400' />
+                <p className='mt-4 text-gray-600'>
                   You haven't uploaded any documents yet
                 </p>
               </div>
@@ -457,46 +458,46 @@ export default function Dashboard() {
 
             {/* Documents table */}
             {filteredDocuments.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white">
-                  <thead className="bg-gray-100">
+              <div className='overflow-x-auto'>
+                <table className='min-w-full bg-white'>
+                  <thead className='bg-gray-100'>
                     <tr>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Document
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Date Uploaded
                       </th>
-                      <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Type
                       </th>
-                      <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className='py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className='divide-y divide-gray-200'>
                     {filteredDocuments.map((doc) => (
-                      <tr key={doc._id} className="hover:bg-gray-50">
-                        <td className="py-4 px-4">
-                          <div className="flex items-center">
-                            <span className="mr-2 text-lg">
+                      <tr key={doc._id} className='hover:bg-gray-50'>
+                        <td className='py-4 px-4'>
+                          <div className='flex items-center'>
+                            <span className='mr-2 text-lg'>
                               {getFileIcon(doc.mimeType)}
                             </span>
                             <div>
                               {editingDoc && editingDoc._id === doc._id ? (
                                 <input
-                                  type="text"
+                                  type='text'
                                   value={newDocName}
                                   onChange={(e) =>
                                     setNewDocName(e.target.value)
                                   }
-                                  className="border rounded px-2 py-1 w-full"
+                                  className='border rounded px-2 py-1 w-full'
                                   autoFocus
                                 />
                               ) : (
                                 <>
-                                  <span className="font-medium text-gray-900 block">
+                                  <span className='font-medium text-gray-900 block'>
                                     {doc.originalName}
                                   </span>
                                   {verificationStatus[doc._id] && (
@@ -516,101 +517,101 @@ export default function Dashboard() {
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 px-4 text-sm text-gray-500">
+                        <td className='py-4 px-4 text-sm text-gray-500'>
                           {formatDate(doc.createdAt)}
                         </td>
-                        <td className="py-4 px-4 text-sm text-gray-500">
+                        <td className='py-4 px-4 text-sm text-gray-500'>
                           {doc.mimeType.split("/")[1].toUpperCase()}
                         </td>
-                        <td className="py-4 px-4 text-right whitespace-nowrap">
+                        <td className='py-4 px-4 text-right whitespace-nowrap'>
                           {editingDoc && editingDoc._id === doc._id ? (
-                            <div className="flex justify-end space-x-2">
+                            <div className='flex justify-end space-x-2'>
                               <button
                                 onClick={saveEdit}
-                                className="bg-green-500 hover:bg-green-600 text-white p-1 rounded"
-                                title="Save"
+                                className='bg-green-500 hover:bg-green-600 text-white p-1 rounded'
+                                title='Save'
                               >
                                 <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
+                                  xmlns='http://www.w3.org/2000/svg'
+                                  className='h-5 w-5'
+                                  fill='none'
+                                  viewBox='0 0 24 24'
+                                  stroke='currentColor'
                                 >
                                   <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
                                     strokeWidth={2}
-                                    d="M5 13l4 4L19 7"
+                                    d='M5 13l4 4L19 7'
                                   />
                                 </svg>
                               </button>
                               <button
                                 onClick={cancelEdit}
-                                className="bg-gray-400 hover:bg-gray-500 text-white p-1 rounded"
-                                title="Cancel"
+                                className='bg-gray-400 hover:bg-gray-500 text-white p-1 rounded'
+                                title='Cancel'
                               >
                                 <X size={20} />
                               </button>
                             </div>
                           ) : showConfirmDelete === doc._id ? (
-                            <div className="flex justify-end space-x-2">
+                            <div className='flex justify-end space-x-2'>
                               <button
                                 onClick={() => handleDelete(doc._id)}
-                                className="bg-red-500 hover:bg-red-600 text-white p-1 rounded"
-                                title="Confirm Delete"
+                                className='bg-red-500 hover:bg-red-600 text-white p-1 rounded'
+                                title='Confirm Delete'
                               >
                                 <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
+                                  xmlns='http://www.w3.org/2000/svg'
+                                  className='h-5 w-5'
+                                  fill='none'
+                                  viewBox='0 0 24 24'
+                                  stroke='currentColor'
                                 >
                                   <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
                                     strokeWidth={2}
-                                    d="M5 13l4 4L19 7"
+                                    d='M5 13l4 4L19 7'
                                   />
                                 </svg>
                               </button>
                               <button
                                 onClick={cancelDelete}
-                                className="bg-gray-400 hover:bg-gray-500 text-white p-1 rounded"
-                                title="Cancel Delete"
+                                className='bg-gray-400 hover:bg-gray-500 text-white p-1 rounded'
+                                title='Cancel Delete'
                               >
                                 <X size={20} />
                               </button>
                             </div>
                           ) : (
-                            <div className="flex justify-end space-x-1">
+                            <div className='flex justify-end space-x-1'>
                               <button
                                 onClick={() => handleDownload(doc._id)}
-                                className="text-blue-500 hover:text-blue-700 p-1"
-                                title="Download"
+                                className='text-blue-500 hover:text-blue-700 p-1'
+                                title='Download'
                               >
                                 <Download size={18} />
                               </button>
                               <button
                                 onClick={() => handleVerifySignature(doc._id)}
-                                className="text-green-600 hover:text-green-800 p-1"
-                                title="Verify Signature"
+                                className='text-green-600 hover:text-green-800 p-1'
+                                title='Verify Signature'
                                 disabled={isLoading}
                               >
                                 <ShieldCheck size={18} />
                               </button>
                               <button
                                 onClick={() => startEdit(doc)}
-                                className="text-indigo-500 hover:text-indigo-700 p-1"
-                                title="Rename"
+                                className='text-indigo-500 hover:text-indigo-700 p-1'
+                                title='Rename'
                               >
                                 <Edit2 size={18} />
                               </button>
                               <button
                                 onClick={() => confirmDelete(doc._id)}
-                                className="text-red-500 hover:text-red-700 p-1"
-                                title="Delete"
+                                className='text-red-500 hover:text-red-700 p-1'
+                                title='Delete'
                               >
                                 <Trash2 size={18} />
                               </button>
@@ -628,7 +629,7 @@ export default function Dashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-4 px-6 text-center text-gray-600 text-sm">
+      <footer className='bg-gray-100 py-4 px-6 text-center text-gray-600 text-sm'>
         <p>
           © 2025 Secure Document Vault. All documents are end-to-end encrypted.
         </p>
