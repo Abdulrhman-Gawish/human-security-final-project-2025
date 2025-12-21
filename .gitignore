@@ -8,6 +8,7 @@ backend/config/*.pem
 backend/config/cert.pem
 backend/config/private_key.pem
 backend/config/public_key.pem
+backend/library-IAM/venv
 
 # Logs
 logs/
