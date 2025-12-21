@@ -1,0 +1,10 @@
+﻿username,email,password,role,lastName
+malak,malak@uni.edu,malak@123,LIB_ADMIN,mohamed
+abdelrahman,abdelrahman@uni.edu,abdel@123,LIB_ADMIN,hashim
+mark,mark@uni.edu,mark@123,LIB_ADMIN,magdy
+ahmed,ahmed@uni.edu,ahmed@123,LIB_STAFF,abdelrahman
+fadya,fadya@uni.edu,fadya@123,LIB_USER,hesham
+karen,karen@uni.edu,karen@123,LIB_USER,alfred
+ahmedd,ahmedhassan@uni.edu,ahmed@123,LIB_USER,hassan
+sara,sara@uni.edu,sara@123,LIB_STAFF,mohamed
+ali,ali@uni.edu,ali@123,LIB_STAFF,ahmed

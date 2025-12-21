@@ -104,10 +104,20 @@ const login = async (req, res, next) => {
  * @access  Private
  */
 const logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+
+  const keycloakLogoutUrl =
+    "http://localhost:8080/realms/library-realm/protocol/openid-connect/logout" +
+    "?client_id=library-frontend" +
+    "&post_logout_redirect_uri=https://localhost:3000/login";
+
   res.status(200).json({
     success: true,
-    message: "User logged out, cookie cleared",
+    logoutUrl: keycloakLogoutUrl,
   });
 };
 
@@ -119,65 +129,43 @@ const logout = (req, res) => {
 const handleAuthCallback = async (req, res, next) => {
   try {
     const { code } = req.body;
+    if (!code) return next(new AppError("Authorization code is required", 400));
 
-    if (!code) {
-      return next(new AppError("Authorization code is required", 400));
-    }
-
-    // Exchange authorization code for tokens
+    // Exchange code for tokens
     const tokenResponse = await axios.post(
       "http://localhost:8080/realms/library-realm/protocol/openid-connect/token",
       new URLSearchParams({
         grant_type: "authorization_code",
         client_id: "library-frontend",
-        client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
         code,
         redirect_uri: "https://localhost:3000/callback",
       }),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
-    console.log("access token: ", access_token);
 
-    if (!access_token) {
+    if (!access_token)
       return next(new AppError("Failed to retrieve access token", 401));
-    }
-    const publicKey = `-----BEGIN PUBLIC KEY-----\n${process.env.PUBLICKEY}\n-----END PUBLIC KEY-----`;
-    console.log("pK", publicKey);
 
+    const publicKey = `-----BEGIN PUBLIC KEY-----\n${process.env.PUBLICKEY}\n-----END PUBLIC KEY-----`;
     const decoded = jwt.verify(access_token, publicKey, {
       algorithms: ["RS256"],
     });
 
-    console.log("decoded: ", decoded);
+    // Determine app role
     const kcRoles = decoded.realm_access?.roles || [];
-
-    let appRole = "user"; // default
-
-    if (kcRoles.includes("STAFF")) {
-      appRole = "staff";
-    }
-
-    if (kcRoles.includes("admin")) {
-      appRole = "admin";
-    }
+    let appRole = kcRoles.includes("LIB_ADMIN")
+      ? "admin"
+      : kcRoles.includes("LIB_STAFF")
+      ? "staff"
+      : "user";
 
     // Fetch user info from Keycloak
     const userInfoResponse = await axios.get(
       "http://localhost:8080/realms/library-realm/protocol/openid-connect/userinfo",
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      }
+      { headers: { Authorization: `Bearer ${access_token}` } }
     );
-
-    console.log("user info: ", userInfoResponse);
 
     const {
       sub: keycloakId,
@@ -188,7 +176,6 @@ const handleAuthCallback = async (req, res, next) => {
 
     // Find or create user
     let user = await User.findOne({ keycloak_id: keycloakId });
-
     if (!user) {
       user = await User.create({
         name: name || preferred_username,
@@ -198,12 +185,10 @@ const handleAuthCallback = async (req, res, next) => {
         role: appRole,
       });
     } else {
-      // keep role in sync with Keycloak
       user.role = appRole;
       await user.save();
     }
 
-    // Issue your app JWT
     const payload = { userId: user._id, userRole: user.role };
     generateTokenAndSetCookie(payload, res);
 

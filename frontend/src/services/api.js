@@ -54,9 +54,18 @@ export const signup = async (formData) => {
 };
 
 export const logout = async () => {
-  const response = await axios.get("/auth/logout");
-  return response.data;
+  const res = await axios.get("/auth/logout", { withCredentials: true });
+
+  // Clear frontend storage
+  sessionStorage.clear();
+  localStorage.clear();
+
+  // Redirect to Keycloak logout
+  if (res.data?.logoutUrl) {
+    window.location.href = res.data.logoutUrl;
+  }
 };
+
 
 export const githubLoginUrl = () => {
   const redirectUri = `${window.location.origin}/auth/callback`;
