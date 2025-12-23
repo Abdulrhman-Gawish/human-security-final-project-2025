@@ -62,24 +62,24 @@ export default function Homepage() {
             <h1 className="text-xl font-bold text-gray-800">FileVault</h1>
           </div>
           <div className="space-x-3">
-            <button
+            {/* <button
               onClick={() => (window.location.href = "/login")}
               className="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-lg transition"
             >
               Login
-            </button>
+            </button> */}
             <button
               onClick={login}
               className="px-4 py-2 text-blue-600 font-medium hover:bg-blue-50 rounded-lg transition"
             >
               Login with keycloak
             </button>
-            <button
+            {/* <button
               onClick={() => (window.location.href = "/signup")}
               className="px-4 py-2 bg-blue-600 text-white font-medium hover:bg-blue-700 rounded-lg transition"
             >
               Sign Up
-            </button>
+            </button> */}
           </div>
         </div>
       </header>

@@ -256,9 +256,9 @@ export default function NormalUserDashboard() {
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Uploaded At
                       </th>
-                      <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                      {/* <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Uploaded By
-                      </th>
+                      </th> */}
                       <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Actions
                       </th>
@@ -312,9 +312,9 @@ export default function NormalUserDashboard() {
                               {formatDate(doc.uploadedAt)}
                             </td>
 
-                            <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
+                            {/* <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
                               {doc.uploadedBy?.name || doc.uploadedBy || "N/A"}
-                            </td>
+                            </td> */}
 
                             <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                               <button

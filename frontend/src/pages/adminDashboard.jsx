@@ -21,6 +21,7 @@ import {
   getLogs,
   getAllDocuments,
   updateDocumentt,
+  updateDocument,
   deleteDocumentt,
 } from "../services/api";
 
@@ -30,7 +31,7 @@ export default function AdminDashboard() {
   const [logs, setLogs] = useState([]);
   const [editingDocId, setEditingDocId] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editName, setEditName] = useState("");
 
@@ -115,7 +116,7 @@ export default function AdminDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const response = await getAllDocuments(); // Replace with your actual API endpoint
+      const response = await getAllDocuments();
       console.log(response.data);
 
       setDocuments(response.data);
@@ -272,6 +273,8 @@ export default function AdminDashboard() {
   };
 
   const startEdit = (doc) => {
+    console.log(doc);
+
     setEditingDoc(doc);
     setNewDocName(doc.docName); // corrected
   };
@@ -283,13 +286,13 @@ export default function AdminDashboard() {
 
   const saveEdit = async () => {
     if (!editingDoc || !newDocName.trim()) return;
-    setLoading(true);
+    setIsLoading(true);
     setError(null);
     try {
-      await updateDocumentt(editingDoc.id, { docName: newDocName }); // corrected
+      await updateDocumentt(editingDoc.id, { originalName: newDocName });
       setDocuments((docs) =>
         docs.map((doc) =>
-          doc.id === editingDoc.id ? { ...doc, docName: newDocName } : doc
+          doc.id === editingDoc.id ? { ...doc, originalName: newDocName } : doc
         )
       );
       cancelEdit();
@@ -297,7 +300,7 @@ export default function AdminDashboard() {
       setError("Failed to update document");
       console.error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -420,9 +423,6 @@ export default function AdminDashboard() {
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Uploaded At
                       </th>
-                      <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Uploaded By
-                      </th>
                       <th className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Actions
                       </th>
@@ -477,7 +477,7 @@ export default function AdminDashboard() {
                             {formatDate(doc.uploadedAt)}
                           </td>
                           <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                            {doc.uploadedBy?.name || doc.uploadedBy || "N/A"}
+                            {doc.uploadedBy?.name || doc.uploadedBy}
                           </td>
                           <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2'>
                             {editingDoc?.id === doc.id ? (

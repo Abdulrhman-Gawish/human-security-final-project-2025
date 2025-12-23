@@ -68,7 +68,7 @@ export default function Dashboard() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getDocuments();
+      const data = await getDocuments();      
       setDocuments(data.data || []);
     } catch (err) {
       setError("Failed to load documents");

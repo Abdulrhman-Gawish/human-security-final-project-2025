@@ -5,7 +5,7 @@ const LogSchema = new Schema({
   action: { type: String, required: true }, 
   entity: { type: String, required: true }, 
   entityId: mongoose.Schema.Types.ObjectId, 
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
+  userId: { type: String }, 
   userDetails: Object,
   details: Object, 
   ipAddress: String, 
