@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const DocumentSchema = new Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: String,
     required: true,
   },
 

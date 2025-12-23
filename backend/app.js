@@ -21,8 +21,13 @@ const sslOptions = {
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: "https://localhost:3000", credentials: true }));
 
+app.use(cors({
+  origin: 'https://localhost:3000', 
+  credentials: true,                
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/documents", documentRoutes);

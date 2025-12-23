@@ -45,7 +45,7 @@ const uploadDocument = async (req, res, next) => {
     const encryptedKey = encryptKey(aesKey, masterKey);
 
     const document = await Document.create({
-      userId: req.userId,
+      userId: req.user.userId,
       originalName: fileName,
       mimeType: mimetype,
       encryptedData,
@@ -59,7 +59,7 @@ const uploadDocument = async (req, res, next) => {
     await Log.create({
       action: "UPLOAD",
       entity: "Document",
-      userId: req.user._id,
+      userId: req.user.userId,
       documentId: document._id,
       userDetails: {
         name: req.user.name,
@@ -105,7 +105,7 @@ const verifyDocumentSignaturee = async (req, res, next) => {
 
     const document = await Document.findOne({
       _id: req.params.id,
-      userId: req.userId,
+      userId: req.user.userId,
     }).select("+encryptedKey +iv +encryptedData +sha256Hash +digitalSignature");
 
     if (!document) {
@@ -200,7 +200,7 @@ const downloadDocument = async (req, res, next) => {
     if (req.role === "staff") {
       const document = await Document.findOne({
         _id: req.params.id,
-        userId: req.userId,
+        userId: req.user.userId,
       });
       if (!document) {
         next(new AppError("File not found", 404));
@@ -229,7 +229,7 @@ const downloadDocument = async (req, res, next) => {
       await Log.create({
         action: "DOWNLOAD_VERIFICATION_FAILED",
         entity: "Document",
-        userId: req.user._id,
+        userId: req.user.userId,
         documentId: document._id,
         userDetails: {
           name: req.user.name,
@@ -250,7 +250,7 @@ const downloadDocument = async (req, res, next) => {
     await Log.create({
       action: "DOWNLOAD",
       entity: "Document",
-      userId: req.user._id,
+      userId: req.user.userId,
       documentId: document._id,
       userDetails: {
         name: req.user.name,
@@ -280,7 +280,7 @@ const downloadDocument = async (req, res, next) => {
  */
 const getDocuments = async (req, res, next) => {
   try {
-    const documents = await Document.find({ userId: req.userId })
+    const documents = await Document.find({ userId: req.user.userId })
       .select(
         "_id originalName createdAt mimeType digitalSignature publicKeyFingerprint"
       )
@@ -290,7 +290,7 @@ const getDocuments = async (req, res, next) => {
     await Log.create({
       action: "READ_ALL",
       entity: "Document",
-      userId: req.user._id,
+      userId: req.user.userId,
       userDetails: {
         name: req.user.name,
         email: req.user.email,
@@ -333,7 +333,7 @@ const updateDocument = async (req, res, next) => {
     }
 
     const updatedDocument = await Document.findOneAndUpdate(
-      { _id: id, userId: req.userId },
+      { _id: id, userId: req.user.userId },
       { originalName: originalName.trim() },
       { new: true, runValidators: true }
     ).select("_id originalName updatedAt mimeType");
@@ -345,7 +345,7 @@ const updateDocument = async (req, res, next) => {
     await Log.create({
       action: "UPDATE",
       entity: "Document",
-      userId: req.user._id,
+      userId: req.user.userId,
       documentId: updatedDocument._id,
       userDetails: {
         name: req.user.name,
@@ -393,7 +393,7 @@ const updateDocumentt = async (req, res, next) => {
     await Log.create({
       action: "UPDATE",
       entity: "Document",
-      userId: req.user._id,
+      userId: req.user.userId,
       documentId: updatedDocument._id,
       userDetails: {
         name: req.user.name,
@@ -429,7 +429,7 @@ const deleteDocument = async (req, res, next) => {
 
     const document = await Document.findOneAndDelete({
       _id: docId,
-      userId: req.userId,
+      userId: req.user.userId,
     });
 
     if (!document) {
@@ -439,7 +439,7 @@ const deleteDocument = async (req, res, next) => {
     await Log.create({
       action: "DELETE",
       entity: "Document",
-      userId: req.user._id,
+      userId: req.user.userId,
       documentId: docId,
       userDetails: {
         name: req.user.name,
@@ -482,7 +482,7 @@ const deleteDocumentt = async (req, res, next) => {
     await Log.create({
       action: "DELETE",
       entity: "Document",
-      userId: req.user._id,
+      userId: req.user.userId,
       documentId: docId,
       userDetails: {
         name: req.user.name,
@@ -527,7 +527,7 @@ const getAllDocuments = async (req, res, next) => {
 
     const documents = await Document.find(query)
       .select("_id originalName createdAt userId")
-      .populate("userId", "name email") // Assuming User model has name and email fields
+      // .populate("userId", "name email") // Assuming User model has name and email fields
       .sort({ createdAt: -1 })
       .lean();
 
@@ -538,19 +538,20 @@ const getAllDocuments = async (req, res, next) => {
         message: "No documents found for this user",
       });
     }
-
+    // const { user, access_token, refresh_token, expires_in } =
+    //   await getKeycloakUserInfo({ code });
     // Format the response data
     const formattedDocuments = documents.map((doc) => ({
       id: doc._id,
       docName: doc.originalName,
       uploadedAt: doc.createdAt,
-      uploadedBy: doc.userId
-        ? {
-            id: doc.userId._id,
-            name: doc.userId.name,
-            email: doc.userId.email,
-          }
-        : null,
+      // uploadedBy: doc.userId
+      //   ? {
+      //       id: doc.userId._id,
+      //       name: doc.userId.name,
+      //       email: doc.userId.email,
+      //     }
+      //   : null,
     }));
     console.log(formattedDocuments);
 

@@ -1,9 +1,8 @@
 const checkRole = (allwedRole) => {
   return (req, res, next) => {
-    const userRole = req.userRole;
+    const userRole = req.user.role;
     console.log(userRole);
 
-    // check
 
     if (!allwedRole.includes(userRole)) {
       return res.status(403).json({
